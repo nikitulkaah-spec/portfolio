@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FLORESPIKA — Citizenship Portal</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    * {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: Inter, sans-serif;
+      overflow-x: hidden;
+      background: #050505;
+      color: white;
+    }
+
+    .bg-flag {
+      background-image:
+        linear-gradient(rgba(0,0,0,.7), rgba(0,0,0,.7)),
+        url('flag.png');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    .glass {
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 0 30px rgba(0,0,0,0.45);
+    }
+
+    .city-card {
+      transition: .3s ease;
+      cursor: pointer;
+    }
+
+    .city-card:hover {
+      transform: translateY(-6px);
+      border-color: #d4af37;
+    }
+
+    .selected-city {
+      border: 2px solid #d4af37 !important;
+      background: rgba(212,175,55,0.15);
+      transform: scale(1.03);
+    }
+
+    .fade-in {
+      animation: fade .7s ease;
+    }
+
+    @keyframes fade {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .passport-card {
+      background-image: url('passport.png');
+      background-size: cover;
+      background-position: center;
+      width: 360px;
+      height: 500px;
+      position: relative;
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(0,0,0,.5);
+    }
+
+    .passport-overlay {
+      position: absolute;
+      inset: 0;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      background: linear-gradient(to top, rgba(0,0,0,.72), transparent 50%);
+    }
+
+    .passport-text {
+      text-shadow: 0 0 8px rgba(0,0,0,.9);
+    }
+
+    canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .gold {
+      color: #d4af37;
+    }
+
+    .btn {
+      transition: .3s;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 20px rgba(212,175,55,.3);
+    }
+
+    .hidden-section {
+      display: none;
+    }
+  </style>
+</head>
+
+<body class="bg-flag min-h-screen">
+
+<canvas id="confetti"></canvas>
+
+<!-- NAV -->
+<nav class="fixed top-0 left-0 w-full z-50 px-6 py-4">
+  <div class="glass rounded-2xl px-6 py-4 flex justify-between items-center">
+
+    <div>
+      <h1 class="text-2xl font-black tracking-[6px]">
+        FLORESPIKA
+      </h1>
+    </div>
+
+    <div class="flex items-center gap-4">
+
+      <div class="text-right">
+        <div class="text-xs opacity-60" id="countdownLabel">
+          До 2026
+        </div>
+        <div id="countdown" class="font-bold text-lg">
+          loading...
+        </div>
+      </div>
+
+      <button
+        id="langToggle"
+        class="glass px-4 py-2 rounded-xl text-sm hover:scale-105 transition"
+      >
+        EN
+      </button>
+
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="min-h-screen flex items-center justify-center px-6">
+
+  <div class="glass rounded-3xl max-w-5xl w-full p-10 md:p-16 fade-in">
+
+    <div class="grid lg:grid-cols-2 gap-12 items-center">
+
+      <div>
+
+        <div class="inline-block px-4 py-2 rounded-full glass text-xs tracking-[4px] mb-6 gold">
+          BIO-TECHNOCRATIC STATE
+        </div>
+
+        <h1
+          class="text-5xl md:text-7xl font-black leading-tight mb-6"
+          id="heroTitle"
+        >
+          ФЛОРЕСПИКА
+        </h1>
+
+        <p
+          id="heroDesc"
+          class="text-white/70 leading-8 text-lg mb-10"
+        >
+          Суверенное биотехнократическое государство
+          в центре океана Eternia, управляемое
+          Верховной Матерью Jessica Lange
+          (Сосна Соснаевна).
+          Мир, где стиль, молодость и дисциплина —
+          абсолют.
+        </p>
+
+        <div class="flex flex-col md:flex-row gap-5">
+
+          <div class="glass rounded-2xl px-6 py-5">
+            <div class="text-sm opacity-60" id="citizenLabel">
+              Граждан в системе
+            </div>
+
+            <div class="text-4xl font-black gold" id="citizenCount">
+              0
+            </div>
+          </div>
+
+          <button
+            id="startBtn"
+            class="btn bg-white text-black font-bold px-8 py-5 rounded-2xl text-lg"
+          >
+            Стать гражданином
+          </button>
+
+        </div>
+      </div>
+
+      <div class="hidden lg:flex justify-center">
+        <img
+          src="passport.png"
+          class="w-[360px] rounded-3xl shadow-2xl hover:scale-105 transition duration-500"
+        />
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- STEP 1 -->
+<section id="lawsSection" class="hidden-section px-6 pb-24">
+
+  <div class="max-w-4xl mx-auto glass rounded-3xl p-10 fade-in">
+
+    <h2 class="text-4xl font-black mb-8" id="lawsTitle">
+      Кодекс Чистоты
+    </h2>
+
+    <div class="space-y-6 text-white/80 leading-8">
+
+      <div class="glass rounded-2xl p-6">
+        ☀️ SPF 50+ обязателен.
+        Прямое солнечное воздействие
+        без защитного экрана запрещено.
+      </div>
+
+      <div class="glass rounded-2xl p-6">
+        🧪 Монополия государства
+        на биосинтез.
+        Незаконный сбор фруктов и
+        домашние serum-лаборатории запрещены.
+      </div>
+
+      <div class="glass rounded-2xl p-6">
+        💉 Все транзакции проводятся
+        через подкожные PTD-чипы.
+      </div>
+
+    </div>
+
+    <button
+      id="acceptLaws"
+      class="btn mt-10 w-full bg-white text-black font-bold py-5 rounded-2xl"
+    >
+      Я прочитал законы
+    </button>
+
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section id="quizSection" class="hidden-section px-6 pb-24">
+
+  <div class="max-w-3xl mx-auto glass rounded-3xl p-10 fade-in">
+
+    <h2 class="text-4xl font-black mb-8" id="quizTitle">
+      Проверка гражданина
+    </h2>
+
+    <form id="quizForm" class="space-y-10">
+
+      <div>
+        <h3 class="font-bold mb-4">
+          1. Какой SPF обязателен?
+        </h3>
+
+        <div class="space-y-3">
+          <label class="block">
+            <input type="radio" name="q1" value="15" />
+            SPF 15
+          </label>
+
+          <label class="block">
+            <input type="radio" name="q1" value="30" />
+            SPF 30
+          </label>
+
+          <label class="block">
+            <input type="radio" name="q1" value="50+" />
+            SPF 50+
+          </label>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="font-bold mb-4">
+          2. Что происходит при нулевом балансе PTD?
+        </h3>
+
+        <div class="space-y-3">
+          <label class="block">
+            <input type="radio" name="q2" value="fine" />
+            Штраф
+          </label>
+
+          <label class="block">
+            <input type="radio" name="q2" value="stasis" />
+            Режим стазиса
+          </label>
+
+          <label class="block">
+            <input type="radio" name="q2" value="deport" />
+            Депортация
+          </label>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="font-bold mb-4">
+          3. Кто абсолютный правитель Флореспики?
+        </h3>
+
+        <div class="space-y-3">
+          <label class="block">
+            <input type="radio" name="q3" value="council" />
+            Генеральный Совет
+          </label>
+
+          <label class="block">
+            <input type="radio" name="q3" value="mother" />
+            Верховная Мать Jessica Lange
+          </label>
+        </div>
+      </div>
+
+      <button
+        class="btn w-full bg-white text-black font-bold py-5 rounded-2xl"
+      >
+        Пройти тест
+      </button>
+
+    </form>
+
+  </div>
+</section>
+
+<!-- REGISTRATION -->
+<section id="registerSection" class="hidden-section px-6 pb-24">
+
+  <div class="max-w-6xl mx-auto glass rounded-3xl p-10 fade-in">
+
+    <h2 class="text-4xl font-black mb-10">
+      Регистрация гражданства
+    </h2>
+
+    <div class="grid md:grid-cols-2 gap-6 mb-10">
+
+      <input
+        id="fullName"
+        type="text"
+        placeholder="Полное имя"
+        class="glass rounded-2xl px-5 py-5 outline-none"
+      />
+
+      <input
+        id="nickname"
+        type="text"
+        placeholder="Никнейм"
+        class="glass rounded-2xl px-5 py-5 outline-none"
+      />
+
+    </div>
+
+    <h3 class="text-2xl font-bold mb-6">
+      Выберите город
+    </h3>
+
+    <div
+      id="cityGrid"
+      class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"
+    ></div>
+
+    <button
+      id="generatePassport"
+      class="btn mt-10 w-full bg-white text-black font-bold py-5 rounded-2xl"
+    >
+      Создать паспорт
+    </button>
+
+  </div>
+</section>
+
+<!-- PASSPORT -->
+<section
+  id="passportSection"
+  class="hidden-section min-h-screen flex items-center justify-center px-6 pb-24"
+>
+
+  <div class="glass rounded-3xl p-10 flex flex-col items-center fade-in">
+
+    <h2 class="text-5xl font-black mb-8 gold">
+      ГРАЖДАНСТВО ПОДТВЕРЖДЕНО
+    </h2>
+
+    <div class="passport-card">
+
+      <div class="passport-overlay">
+
+        <div class="passport-text space-y-3">
+
+          <div>
+            <div class="text-xs opacity-70">
+              FULL NAME
+            </div>
+
+            <div
+              id="passName"
+              class="text-xl font-black"
+            ></div>
+          </div>
+
+          <div>
+            <div class="text-xs opacity-70">
+              CITY
+            </div>
+
+            <div
+              id="passCity"
+              class="text-xl font-black"
+            ></div>
+          </div>
+
+          <div>
+            <div class="text-xs opacity-70">
+              CITIZEN ID
+            </div>
+
+            <div
+              id="passId"
+              class="text-xl font-black"
+            ></div>
+          </div>
+
+          <div>
+            <div class="text-xs opacity-70">
+              ISSUE DATE
+            </div>
+
+            <div class="text-xl font-black">
+              2026
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <button
+      id="downloadPassport"
+      class="btn mt-8 bg-white text-black font-bold px-8 py-4 rounded-2xl"
+    >
+      Скачать паспорт
+    </button>
+
+  </div>
+
+</section>
+
+<script>
+
+  // ===============================
+  // LANGUAGE
+  // ===============================
+
+  let currentLang = "ru";
+
+  const translations = {
+    ru: {
+      apply: "Стать гражданином",
+      citizens: "Граждан в системе",
+      lawsBtn: "Я прочитал законы"
+    },
+    en: {
+      apply: "Apply for Citizenship",
+      citizens: "Citizens in system",
+      lawsBtn: "I have read the laws"
+    }
+  };
+
+  const langToggle = document.getElementById("langToggle");
+
+  langToggle.onclick = () => {
+
+    currentLang = currentLang === "ru"
+      ? "en"
+      : "ru";
+
+    langToggle.innerText =
+      currentLang === "ru"
+      ? "EN"
+      : "RU";
+
+    document.getElementById("startBtn").innerText =
+      translations[currentLang].apply;
+
+    document.getElementById("citizenLabel").innerText =
+      translations[currentLang].citizens;
+
+    document.getElementById("acceptLaws").innerText =
+      translations[currentLang].lawsBtn;
+
+  };
+
+  // ===============================
+  // COUNTDOWN
+  // ===============================
+
+  function updateCountdown() {
+
+    const target = new Date("2026-01-01");
+
+    const now = new Date();
+
+    const diff = target - now;
+
+    const days = Math.floor(diff / 1000 / 60 / 60 / 24);
+
+    document.getElementById("countdown").innerText =
+      days + " days";
+
+  }
+
+  setInterval(updateCountdown, 1000);
+
+  updateCountdown();
+
+  // ===============================
+  // REAL CITIZEN COUNTER
+  // ===============================
+
+  /*
+    FIREBASE / SUPABASE READY
+
+    Example database structure:
+
+    citizens_meta / global
+    {
+      count: 0
+    }
+
+    USERS COLLECTION:
+    citizens / randomID
+  */
+
+  async function fetchCitizenCount() {
+
+    /*
+      EXAMPLE FIREBASE:
+
+      const docRef = doc(db, "citizens_meta", "global");
+      const docSnap = await getDoc(docRef);
+
+      if(docSnap.exists()) {
+          return docSnap.data().count;
+      }
+
+    */
+
+    let count = localStorage.getItem("florespika_count");
+
+    if (!count) {
+      count = 0;
+      localStorage.setItem("florespika_count", count);
+    }
+
+    document.getElementById("citizenCount").innerText = count;
+
+  }
+
+  async function incrementCitizenCount() {
+
+    /*
+      EXAMPLE FIREBASE:
+
+      await updateDoc(doc(db, "citizens_meta", "global"), {
+          count: increment(1)
+      });
+
+    */
+
+    let count = Number(localStorage.getItem("florespika_count") || 0);
+
+    count++;
+
+    localStorage.setItem("florespika_count", count);
+
+    document.getElementById("citizenCount").innerText = count;
+
+  }
+
+  fetchCitizenCount();
+
+  // ===============================
+  // ONLY ONE PASSPORT
+  // ===============================
+
+  const alreadyCitizen =
+    localStorage.getItem("florespika_passport");
+
+  if (alreadyCitizen) {
+
+    document.getElementById("startBtn").innerText =
+      "Паспорт уже зарегистрирован";
+
+    document.getElementById("startBtn").disabled = true;
+
+    document.getElementById("startBtn")
+      .classList.add("opacity-50");
+
+  }
+
+  // ===============================
+  // STEP FLOW
+  // ===============================
+
+  const startBtn =
+    document.getElementById("startBtn");
+
+  startBtn.onclick = () => {
+
+    document.getElementById("lawsSection")
+      .style.display = "block";
+
+    document.getElementById("lawsSection")
+      .scrollIntoView({ behavior: "smooth" });
+
+  };
+
+  document.getElementById("acceptLaws")
+    .onclick = () => {
+
+      document.getElementById("quizSection")
+        .style.display = "block";
+
+      document.getElementById("quizSection")
+        .scrollIntoView({ behavior: "smooth" });
+
+    };
+
+  // ===============================
+  // QUIZ
+  // ===============================
+
+  document.getElementById("quizForm")
+    .onsubmit = (e) => {
+
+      e.preventDefault();
+
+      const q1 =
+        document.querySelector('input[name="q1"]:checked');
+
+      const q2 =
+        document.querySelector('input[name="q2"]:checked');
+
+      const q3 =
+        document.querySelector('input[name="q3"]:checked');
+
+      if (
+        q1?.value === "50+" &&
+        q2?.value === "stasis" &&
+        q3?.value === "mother"
+      ) {
+
+        document.getElementById("registerSection")
+          .style.display = "block";
+
+        document.getElementById("registerSection")
+          .scrollIntoView({ behavior: "smooth" });
+
+      } else {
+
+        alert(
+          "ACCESS DENIED.\nRe-read the Purity Code."
+        );
+
+        location.reload();
+
+      }
+
+    };
+
+  // ===============================
+  // CITIES
+  // ===============================
+
+  const cities = [
+    "Retinol Hills",
+    "Narciss",
+    "Verdantia",
+    "Sanctum",
+    "Avalon",
+    "Olivine",
+    "Ashford"
+  ];
+
+  let selectedCity = null;
+
+  const cityGrid =
+    document.getElementById("cityGrid");
+
+  cities.forEach(city => {
+
+    const div = document.createElement("div");
+
+    div.className =
+      "city-card glass rounded-3xl p-8 border border-white/10";
+
+    div.innerHTML = `
+      <h3 class="text-2xl font-black mb-2">
+        ${city}
+      </h3>
+
+      <p class="opacity-60">
+        Premium district of Florespika
+      </p>
+    `;
+
+    div.onclick = () => {
+
+      document.querySelectorAll(".city-card")
+        .forEach(el =>
+          el.classList.remove("selected-city")
+        );
+
+      div.classList.add("selected-city");
+
+      selectedCity = city;
+
+    };
+
+    cityGrid.appendChild(div);
+
+  });
+
+  // ===============================
+  // GENERATE PASSPORT
+  // ===============================
+
+  document.getElementById("generatePassport")
+    .onclick = async () => {
+
+      const fullName =
+        document.getElementById("fullName").value;
+
+      const nickname =
+        document.getElementById("nickname").value;
+
+      if (
+        !fullName ||
+        !nickname ||
+        !selectedCity
+      ) {
+
+        alert("Заполните все поля");
+
+        return;
+
+      }
+
+      const id =
+        "FLR-" +
+        Math.floor(
+          100000 + Math.random() * 900000
+        );
+
+      document.getElementById("passName")
+        .innerText = fullName;
+
+      document.getElementById("passCity")
+        .innerText = selectedCity;
+
+      document.getElementById("passId")
+        .innerText = id;
+
+      document.getElementById("passportSection")
+        .style.display = "flex";
+
+      document.getElementById("passportSection")
+        .scrollIntoView({ behavior: "smooth" });
+
+      localStorage.setItem(
+        "florespika_passport",
+        JSON.stringify({
+          fullName,
+          nickname,
+          selectedCity,
+          id
+        })
+      );
+
+      await incrementCitizenCount();
+
+      launchConfetti();
+
+    };
+
+  // ===============================
+  // DOWNLOAD
+  // ===============================
+
+  document.getElementById("downloadPassport")
+    .onclick = () => {
+
+      window.print();
+
+    };
+
+  // ===============================
+  // CONFETTI
+  // ===============================
+
+  const canvas =
+    document.getElementById("confetti");
+
+  const ctx =
+    canvas.getContext("2d");
+
+  let pieces = [];
+
+  function resizeCanvas() {
+
+    canvas.width = window.innerWidth;
+
+    canvas.height = window.innerHeight;
+
+  }
+
+  resizeCanvas();
+
+  window.addEventListener("resize", resizeCanvas);
+
+  function launchConfetti() {
+
+    pieces = [];
+
+    for (let i = 0; i < 200; i++) {
+
+      pieces.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        r: Math.random() * 6 + 2,
+        d: Math.random() * 20,
+        speed: Math.random() * 3 + 2
+      });
+
+    }
+
+    animateConfetti();
+
+  }
+
+  function animateConfetti() {
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    pieces.forEach(p => {
+
+      ctx.beginPath();
+
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+
+      ctx.fillStyle =
+        `hsl(${Math.random() * 360},100%,70%)`;
+
+      ctx.fill();
+
+      p.y += p.speed;
+
+      if (p.y > canvas.height) {
+        p.y = -10;
+      }
+
+    });
+
+    requestAnimationFrame(animateConfetti);
+
+  }
+
+</script>
+
+</body>
+</html>
