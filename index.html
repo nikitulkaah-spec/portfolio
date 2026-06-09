@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI & Full Stack Developer | Creative Technologist</title>
+    <meta name="description" content="Создаю современные цифровые продукты на стыке AI, дизайна и технологий.">
+    
+    <!-- Подключение шрифтов -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Подключение иконок -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* ================= BASE & VARIABLES ================= */
+        :root {
+            --bg-color: #030305;
+            --text-main: #f5f5f7;
+            --text-muted: #888891;
+            --accent-1: #6366f1;
+            --accent-2: #a855f7;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --font-main: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        canvas#webgl-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+
+        /* ================= UTILITIES ================= */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, #fff 0%, #a1a1aa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .text-gradient-accent {
+            background: linear-gradient(135deg, var(--accent-1) 0%, var(--accent-2) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 4rem;
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.2rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2));
+            border: 1px solid rgba(168, 85, 247, 0.4);
+            border-radius: 100px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 40px rgba(168, 85, 247, 0.3);
+            border-color: rgba(168, 85, 247, 0.8);
+            transform: translateY(-2px);
+        }
+
+        /* ================= HERO SECTION ================= */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            z-index: 10;
+        }
+
+        .hero-subtitle {
+            font-family: var(--font-display);
+            color: var(--accent-1);
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 6vw, 5.5rem);
+            line-height: 1.1;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.03em;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            line-height: 1.6;
+        }
+
+        /* ================= FEATURED PROJECTS ================= */
+        .projects {
+            padding: 10rem 0;
+            position: relative;
+        }
+
+        .project-card {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            margin-bottom: 8rem;
+        }
+
+        .project-card:nth-child(even) {
+            direction: rtl;
+        }
+
+        .project-card:nth-child(even) > * {
+            direction: ltr;
+        }
+
+        .project-image-wrapper {
+            position: relative;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            transform-style: preserve-3d;
+        }
+
+        .project-image-wrapper::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .project-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 24px;
+            transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .project-card:hover .project-image {
+            transform: scale(1.05);
+        }
+
+        .project-info h3 {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .project-category {
+            color: var(--accent-2);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .project-desc {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tech-tag {
+            padding: 0.4rem 1rem;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* ================= 3D INTERACTIVE SHOWCASE ================= */
+        .showcase-wrapper {
+            height: 300vh;
+            position: relative;
+        }
+
+        .showcase-sticky {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            perspective: 1000px;
+        }
+
+        .showcase-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            transform-style: preserve-3d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .showcase-card {
+            position: absolute;
+            width: 60vw;
+            max-width: 800px;
+            aspect-ratio: 16/9;
+            border-radius: 20px;
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .showcase-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            border-radius: 20px;
+        }
+
+        /* ================= SKILLS ================= */
+        .skills {
+            padding: 10rem 0;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .skill-group {
+            padding: 2.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .skill-group:hover {
+            transform: translateY(-5px);
+            border-color: rgba(168, 85, 247, 0.3);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.05);
+        }
+
+        .skill-group h4 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: #fff;
+        }
+
+        .skill-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .skill-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .skill-item i-lucide {
+            color: var(--accent-1);
+            width: 20px;
+            height: 20px;
+        }
+
+        /* ================= SERVICES ================= */
+        .services {
+            padding: 10rem 0;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .service-card {
+            padding: 3rem 2rem;
+            position: relative;
+            overflow: hidden;
+            cursor: default;
+        }
+
+        .service-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(99, 102, 241, 0.06), transparent 40%);
+            z-index: 0;
+            transition: opacity 0.3s ease;
+            opacity: 0;
+        }
+
+        .service-card:hover::before { opacity: 1; }
+        
+        .service-card * { position: relative; z-index: 1; }
+
+        .service-card i-lucide {
+            width: 40px; height: 40px;
+            color: var(--accent-2);
+            margin-bottom: 1.5rem;
+        }
+
+        .service-card h4 {
+            font-size: 1.5rem;
+            font-family: var(--font-display);
+            margin-bottom: 1rem;
+        }
+
+        .service-card p {
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* ================= PROCESS ================= */
+        .process {
+            padding: 10rem 0;
+            overflow: hidden;
+        }
+
+        .process-track {
+            display: flex;
+            gap: 2rem;
+            padding-top: 2rem;
+            position: relative;
+        }
+
+        .process-track::before {
+            content: '';
+            position: absolute;
+            top: 40px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: var(--glass-border);
+            z-index: 0;
+        }
+
+        .process-step {
+            min-width: 300px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-num {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-color);
+            border: 1px solid var(--accent-1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-weight: 700;
+            color: var(--accent-1);
+            margin-bottom: 2rem;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+        }
+
+        .process-step h4 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            font-family: var(--font-display);
+        }
+
+        .process-step p {
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* ================= ABOUT ================= */
+        .about {
+            padding: 15rem 0;
+            text-align: center;
+        }
+
+        .about h2 {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            line-height: 1.2;
+            max-width: 1000px;
+            margin: 0 auto 3rem;
+        }
+
+        .about p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        /* ================= FINAL CTA ================= */
+        .cta {
+            padding: 15rem 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .cta::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .cta h2 {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 7vw, 6rem);
+            margin-bottom: 1rem;
+            letter-spacing: -0.04em;
+        }
+
+        .cta p {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            margin-bottom: 4rem;
+        }
+
+        .btn-massive {
+            font-size: 1.5rem;
+            padding: 1.5rem 4rem;
+            border-radius: 100px;
+        }
+
+        /* ================= FLOATING TELEGRAM BUTTON ================= */
+        .tg-floating {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 64px;
+            height: 64px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            z-index: 999;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 20px rgba(99, 102, 241, 0.2);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-decoration: none;
+        }
+
+        .tg-floating::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            z-index: -1;
+            opacity: 0.5;
+            filter: blur(8px);
+            transition: opacity 0.3s;
+        }
+
+        .tg-floating:hover {
+            transform: scale(1.1);
+        }
+
+        .tg-floating:hover::before {
+            opacity: 1;
+        }
+
+        /* ================= FOOTER ================= */
+        footer {
+            padding: 3rem 0;
+            text-align: center;
+            border-top: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* ================= RESPONSIVE ================= */
+        @media (max-width: 768px) {
+            .project-card, .project-card:nth-child(even) {
+                grid-template-columns: 1fr;
+                direction: ltr;
+                gap: 2rem;
+                margin-bottom: 5rem;
+            }
+            .project-card:nth-child(even) > * { direction: ltr; }
+            .section-title { font-size: 2rem; margin-bottom: 2rem; }
+            .showcase-card { width: 90vw; }
+            .process-track { flex-direction: column; padding-top: 0; gap: 3rem; }
+            .process-track::before {
+                top: 0; left: 19px; width: 1px; height: 100%;
+            }
+            .step-num { margin-bottom: 1rem; }
+            .tg-floating { bottom: 1.5rem; right: 1.5rem; width: 56px; height: 56px; }
+        }
+
+        /* Reveal Animation Utility */
+        .reveal { opacity: 0; transform: translateY(50px); }
+    </style>
+</head>
+<body>
+
+    <!-- 3D Background -->
+    <canvas id="webgl-canvas"></canvas>
+
+    <!-- Floating Telegram -->
+    <a href="https://t.me/maonteel" target="_blank" class="tg-floating magnetic">
+        <i-lucide name="send" style="width: 28px; height: 28px; margin-right: 2px; margin-top: 2px;"></i-lucide>
+    </a>
+
+    <!-- 1. HERO SECTION -->
+    <section class="hero">
+        <div class="container hero-content">
+            <span class="hero-subtitle reveal">AI Developer • Full Stack Developer • Creative Technologist</span>
+            <h1 class="reveal">Создаю современные <br><span class="text-gradient">цифровые продукты</span></h1>
+            <p class="reveal">Разрабатываю сайты, лендинги, AI-инструменты и цифровые продукты с упором на современный дизайн, производительность и пользовательский опыт.</p>
+            <div class="reveal">
+                <a href="#projects" class="btn-primary magnetic">Посмотреть проекты</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. FEATURED PROJECTS -->
+    <section id="projects" class="projects">
+        <div class="container">
+            <h2 class="section-title text-gradient reveal">Featured Work</h2>
+            
+            <!-- Project 1 -->
+            <div class="project-card reveal">
+                <div class="project-image-wrapper" data-tilt data-tilt-max="5" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.2">
+                    <img src="1.png" alt="AI Platform" class="project-image">
+                </div>
+                <div class="project-info">
+                    <span class="project-category">AI Integration & Web App</span>
+                    <h3>Нейросетевая Платформа</h3>
+                    <p class="project-desc">Комплексный AI-инструмент с интеграцией OpenAI API. Современный интерфейс, высокая скорость работы и продуманный UX для работы с генеративными моделями.</p>
+                    <div class="tech-stack">
+                        <span class="tech-tag">React</span>
+                        <span class="tech-tag">Next.js</span>
+                        <span class="tech-tag">OpenAI API</span>
+                        <span class="tech-tag">Tailwind</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project 2 -->
+            <div class="project-card reveal">
+                <div class="project-image-wrapper" data-tilt data-tilt-max="5" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.2">
+                    <img src="2.png" alt="FinTech Dashboard" class="project-image">
+                </div>
+                <div class="project-info">
+                    <span class="project-category">Full Stack Dashboard</span>
+                    <h3>FinTech Аналитика</h3>
+                    <p class="project-desc">Интерактивный дашборд для финансовой аналитики. Сложная визуализация данных, real-time обновления и безопасная архитектура.</p>
+                    <div class="tech-stack">
+                        <span class="tech-tag">TypeScript</span>
+                        <span class="tech-tag">Node.js</span>
+                        <span class="tech-tag">PostgreSQL</span>
+                        <span class="tech-tag">WebGL</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project 3 -->
+            <div class="project-card reveal">
+                <div class="project-image-wrapper" data-tilt data-tilt-max="5" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.2">
+                    <img src="3.png" alt="Creative E-commerce" class="project-image">
+                </div>
+                <div class="project-info">
+                    <span class="project-category">Creative Development</span>
+                    <h3>Премиальный E-commerce</h3>
+                    <p class="project-desc">Интернет-магазин с кинематографичными анимациями, плавными переходами страниц и 3D-просмотром товаров.</p>
+                    <div class="tech-stack">
+                        <span class="tech-tag">Three.js</span>
+                        <span class="tech-tag">GSAP</span>
+                        <span class="tech-tag">Lenis</span>
+                        <span class="tech-tag">Framer Motion</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. INTERACTIVE SHOWCASE -->
+    <section class="showcase-wrapper">
+        <div class="showcase-sticky">
+            <div class="container">
+                <h2 class="section-title text-gradient" style="text-align: center; margin-top: 5rem;">Interactive Showcase</h2>
+            </div>
+            <div class="showcase-container" id="showcase-container">
+                <div class="showcase-card" style="background-image: url('1.png'); z-index: 3;"></div>
+                <div class="showcase-card" style="background-image: url('2.png'); z-index: 2;"></div>
+                <div class="showcase-card" style="background-image: url('3.png'); z-index: 1;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. SKILLS -->
+    <section class="skills">
+        <div class="container">
+            <h2 class="section-title text-gradient reveal">Компетенции</h2>
+            <div class="skills-grid">
+                
+                <div class="skill-group glass reveal">
+                    <h4>Frontend Development</h4>
+                    <div class="skill-list">
+                        <div class="skill-item"><i-lucide name="check-circle-2"></i-lucide> React & Next.js</div>
+                        <div class="skill-item"><i-lucide name="check-circle-2"></i-lucide> TypeScript</div>
+                        <div class="skill-item"><i-lucide name="check-circle-2"></i-lucide> Tailwind CSS</div>
+                        <div class="skill-item"><i-lucide name="check-circle-2"></i-lucide> Современная архитектура</div>
+                    </div>
+                </div>
+
+                <div class="skill-group glass reveal">
+                    <h4>Backend Development</h4>
+                    <div class="skill-list">
+                        <div class="skill-item"><i-lucide name="check-circle-2"></i-lucide> Node.js & Express</div>
+                        <div class="skill-item"><i-lucide name="check-circle-2"></i-lucide> RESTful APIs</div>
+                        <div class="skill-item"><i-lucide name="check-circle-2"></i-lucide> SQL & NoSQL Базы данных</div>
+                        <div class="skill-item"><i-lucide name="check-circle-2"></i-lucide> Серверная логика</div>
+                    </div>
+                </div>
+
+                <div class="skill-group glass reveal">
+                    <h4>AI Development</h4>
+                    <div class="skill-list">
+                        <div class="skill-item"><i-lucide name="check-circle-2"></i-lucide> OpenAI API</div>
+                        <div class="skill-item"><i-lucide name="check-circle-2"></i-lucide> AI Интеграции</div>
+                        <div class="skill-item"><i-lucide name="check-circle-2"></i-lucide> Автоматизация бизнес-процессов</div>
+                        <div class="skill-item"><i-lucide name="check-circle-2"></i-lucide> LLM Агенты</div>
+                    </div>
+                </div>
+
+                <div class="skill-group glass reveal">
+                    <h4>Creative Development</h4>
+                    <div class="skill-list">
+                        <div class="skill-item"><i-lucide name="check-circle-2"></i-lucide> Three.js & WebGL</div>
+                        <div class="skill-item"><i-lucide name="check-circle-2"></i-lucide> GSAP Animations</div>
+                        <div class="skill-item"><i-lucide name="check-circle-2"></i-lucide> Motion Design</div>
+                        <div class="skill-item"><i-lucide name="check-circle-2"></i-lucide> Interactive Experiences</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. SERVICES -->
+    <section class="services">
+        <div class="container">
+            <h2 class="section-title text-gradient reveal">Услуги</h2>
+            <div class="services-grid">
+                <div class="service-card glass reveal">
+                    <i-lucide name="layout"></i-lucide>
+                    <h4>Landing Pages</h4>
+                    <p>Премиальные посадочные страницы с высокой конверсией, 3D-анимациями и безупречным дизайном.</p>
+                </div>
+                <div class="service-card glass reveal">
+                    <i-lucide name="globe"></i-lucide>
+                    <h4>Business Websites</h4>
+                    <p>Корпоративные сайты, подчеркивающие статус компании и привлекающие крупных клиентов.</p>
+                </div>
+                <div class="service-card glass reveal">
+                    <i-lucide name="rocket"></i-lucide>
+                    <h4>Startup MVP</h4>
+                    <p>Быстрая и качественная разработка первой версии продукта для проверки гипотез и показа инвесторам.</p>
+                </div>
+                <div class="service-card glass reveal">
+                    <i-lucide name="cpu"></i-lucide>
+                    <h4>AI Products</h4>
+                    <p>Внедрение нейросетей в ваши процессы: чат-боты, генераторы контента, системы аналитики.</p>
+                </div>
+                <div class="service-card glass reveal">
+                    <i-lucide name="sparkles"></i-lucide>
+                    <h4>Creative Websites</h4>
+                    <p>Сайты-награды с использованием WebGL и нестандартных интерактивных механик.</p>
+                </div>
+                <div class="service-card glass reveal">
+                    <i-lucide name="settings"></i-lucide>
+                    <h4>Automation</h4>
+                    <p>Разработка кастомных решений для автоматизации рутины и оптимизации работы бизнеса.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. PROCESS -->
+    <section class="process">
+        <div class="container">
+            <h2 class="section-title text-gradient reveal">Процесс</h2>
+            <div class="process-track reveal">
+                <div class="process-step">
+                    <div class="step-num">01</div>
+                    <h4>Discovery</h4>
+                    <p>Погружение в бизнес, постановка целей и определение технического стека.</p>
+                </div>
+                <div class="process-step">
+                    <div class="step-num">02</div>
+                    <h4>Research</h4>
+                    <p>Анализ конкурентов, UX-проектирование и создание архитектуры проекта.</p>
+                </div>
+                <div class="process-step">
+                    <div class="step-num">03</div>
+                    <h4>Design</h4>
+                    <p>Разработка премиального визуального стиля и интерактивных концептов.</p>
+                </div>
+                <div class="process-step">
+                    <div class="step-num">04</div>
+                    <h4>Development</h4>
+                    <p>Чистый код, интеграция AI и создание плавных анимаций (Frontend + Backend).</p>
+                </div>
+                <div class="process-step">
+                    <div class="step-num">05</div>
+                    <h4>Launch</h4>
+                    <p>Тестирование, оптимизация производительности (Lighthouse 95+) и релиз.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. ABOUT -->
+    <section class="about">
+        <div class="container">
+            <h2 class="text-gradient-accent reveal">Разработка на стыке технологий, дизайна и AI</h2>
+            <p class="reveal">Создаю современные цифровые продукты, объединяя программирование, дизайн, искусственный интеллект и интерактивные технологии. Помогаю запускать проекты быстро, красиво и эффективно.</p>
+        </div>
+    </section>
+
+    <!-- 8. FINAL CTA -->
+    <section class="cta">
+        <div class="container">
+            <h2 class="text-gradient reveal">Готовы запустить проект?</h2>
+            <p class="reveal">Обсудим идею, сроки и реализацию в Telegram.</p>
+            <div class="reveal">
+                <a href="https://t.me/maonteel" target="_blank" class="btn-primary btn-massive magnetic">Написать в Telegram</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>© 2025 Creative Technologist. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- ================= SCRIPTS ================= -->
+    <!-- CDN Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.33/dist/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+
+    <script>
+        // Инициализация иконок
+        lucide.createIcons();
+
+        // 1. Lenis Smooth Scroll
+        const lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            direction: 'vertical',
+            gestureDirection: 'vertical',
+            smooth: true,
+            mouseMultiplier: 1,
+            smoothTouch: false,
+            touchMultiplier: 2,
+        });
+
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+
+        // Интеграция GSAP ScrollTrigger с Lenis
+        gsap.registerPlugin(ScrollTrigger);
+        
+        lenis.on('scroll', ScrollTrigger.update);
+        gsap.ticker.add((time)=>{ lenis.raf(time * 1000) });
+        gsap.ticker.lagSmoothing(0, 0);
+
+        // 2. Three.js Background (Кинематографичные частицы/звезды)
+        const initThreeJS = () => {
+            const canvas = document.getElementById('webgl-canvas');
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x030305, 0.001);
+
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+            camera.position.z = 1000;
+
+            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            // Частицы
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 2000;
+            const posArray = new Float32Array(particlesCount * 3);
+
+            for(let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 3000;
+            }
+
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+            const material = new THREE.PointsMaterial({
+                size: 3,
+                color: 0x8b5cf6, // Неоновый фиолетовый
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+
+            const particlesMesh = new THREE.Points(particlesGeometry, material);
+            scene.add(particlesMesh);
+
+            // Интерактивность мыши
+            let mouseX = 0;
+            let mouseY = 0;
+            let targetX = 0;
+            let targetY = 0;
+            const windowHalfX = window.innerWidth / 2;
+            const windowHalfY = window.innerHeight / 2;
+
+            document.addEventListener('mousemove', (event) => {
+                mouseX = (event.clientX - windowHalfX);
+                mouseY = (event.clientY - windowHalfY);
+            });
+
+            // Анимация
+            const clock = new THREE.Clock();
+
+            const animate = () => {
+                const elapsedTime = clock.getElapsedTime();
+
+                targetX = mouseX * 0.001;
+                targetY = mouseY * 0.001;
+
+                particlesMesh.rotation.y += 0.0005;
+                particlesMesh.rotation.x += 0.0002;
+
+                // Плавное следование за мышью
+                camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.02;
+                camera.position.y += (-mouseY * 0.5 - camera.position.y) * 0.02;
+                camera.lookAt(scene.position);
+
+                renderer.render(scene, camera);
+                requestAnimationFrame(animate);
+            };
+            animate();
+
+            // Ресайз
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        };
+        initThreeJS();
+
+        // 3. GSAP Reveals
+        const revealElements = document.querySelectorAll('.reveal');
+        revealElements.forEach((el) => {
+            gsap.to(el, {
+                scrollTrigger: {
+                    trigger: el,
+                    start: "top 85%",
+                    toggleActions: "play none none reverse"
+                },
+                opacity: 1,
+                y: 0,
+                duration: 1,
+                ease: "power3.out"
+            });
+        });
+
+        // 4. Interactive 3D Showcase Animation
+        const showcaseCards = document.querySelectorAll('.showcase-card');
+        
+        // Начальная установка
+        gsap.set(showcaseCards, {
+            z: (i) => -1000 * i,
+            opacity: (i) => 1 - (i * 0.3),
+            y: (i) => i * 50
+        });
+
+        // Анимация скролла
+        const showcaseTl = gsap.timeline({
+            scrollTrigger: {
+                trigger: ".showcase-wrapper",
+                start: "top top",
+                end: "bottom bottom",
+                scrub: 1
+            }
+        });
+
+        showcaseCards.forEach((card, i) => {
+            showcaseTl.to(card, {
+                z: 1000,
+                opacity: 0,
+                ease: "none"
+            }, 0);
+        });
+
+        // 5. Magnetic Buttons
+        const magneticElements = document.querySelectorAll('.magnetic');
+        magneticElements.forEach((elem) => {
+            elem.addEventListener('mousemove', (e) => {
+                const rect = elem.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                
+                gsap.to(elem, {
+                    x: x * 0.3,
+                    y: y * 0.3,
+                    duration: 0.5,
+                    ease: "power3.out"
+                });
+            });
+
+            elem.addEventListener('mouseleave', () => {
+                gsap.to(elem, {
+                    x: 0,
+                    y: 0,
+                    duration: 0.5,
+                    ease: "elastic.out(1, 0.3)"
+                });
+            });
+        });
+
+        // 6. Service Cards Spotlight Effect (Apple/Linear style)
+        document.querySelectorAll('.service-card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+
+        // 7. Horizontal Process animation (на десктопе)
+        if(window.innerWidth > 768) {
+            gsap.to(".process-track", {
+                scrollTrigger: {
+                    trigger: ".process",
+                    start: "top center",
+                    end: "bottom center",
+                    scrub: 1
+                },
+                x: () => -(document.querySelector('.process-track').scrollWidth - window.innerWidth + 100),
+                ease: "none"
+            });
+        }
+    </script>
+</body>
+</html>
+<!-- 
+=== СООТВЕТСТВИЕ ПРОЕКТОВ ===
+
+Проект 1 (Нейросетевая Платформа): изображение: 1.png
+Проект 2 (FinTech Аналитика): изображение: 2.png
+Проект 3 (Премиальный E-commerce): изображение: 3.png
+
+Изображения также повторно используются в блоке Interactive Showcase в качестве текстур для 3D-карточек (1.png на переднем плане, 2.png за ней, 3.png самая дальняя).
+-->
